@@ -1,0 +1,66 @@
+工作规范(*越多的项目越需要格外注意)：
+*1.所有事都要按我的要求做，如果看不懂我的要求不要胡来，也不要和我掰扯。
+2.服务器端从sessid确定它是谁，和前端没关系。
+3.每次提交之后用测试环境测试能不能编译通过，每次把gitlab上弄得编译不过，当月扣一千元工资。
+4.setAutoCommit(false) 之后，在try 块退出的时候要做commit()，commit()不能在finally里。
+5.对象判断是不是空用 == null，字符串判断是不是空不用equals。
+6.sql文件里的每个建表语句，建视图的语句后面都要加分号。
+7.数据库的每个表和每个列都要把注释写清楚。
+8.记本上的东西都需要背下来并永远照着做。
+9.别人说有问题的时候永远不要说自己这里是好的。
+6月1号添加：
+10.照着说的原样做，不要做其他改动。
+11.每次修改sql文件(表及视图)后，都要在本地跑一遍，确定无误后再提交；若导致gitlab上的sql文件执行出现错误，当月扣一千元工资。
+6月8号：
+12.修改表结构的语句写在文件最后面。
+13.永远不能在代码里假设配置文件的路径。
+6.17
+14.不要提交有编译警告的代码
+6.26
+15.客户端检查大部分情况下是可有可无的。有两种情况需要在客户端做检查： 1.检查操作本身特别消耗计算资源。2. 这个检查大概率的结果是失败。
+7.3
+16.`dbconn.setReadOnly(true);` 永远不要写这个
+7.4
+17.数据库连接都写成 try (Connection dbconn = getConnection) 这种形式
+7.10
+18.每次改数据库都要跑RefreshDevDB 验证语句是对的
+7.18
+19.所有提交了之后会导致改数据库里数的表单，提交之后都要在客户端清空上次填的。
+9.6
+20.出现问题时要首先怀疑是自己的改动造成的
+11.15
+21.如果没写好也要告诉我没写好
+12.20
+22.以后再改数据库，我说可以了之后才能提交代码，如果违反的话当月工资扣一千元
+2020.01.04
+23.数据库改动单独提交，单独弄 merge request
+2020.02.22
+24.每次代码改动都要先有gitlab issue,然后建立和issueXX同名的分支,在issue分支里提交代码和创建merge request。
+        相关的java代码里要注释清楚这些代码是为了做issueXX而写的。
+        还要把issueXX中的逻辑在java代码里的注释里再写一遍。
+25.每个merge request里都要带上issue的url,同时还要在merge request里写清楚改了什么。
+26.理解孙子为吴王练兵的故事。 http://wzs7195.lofter.com/post/1cc5b6f5_da55ecd。
+2020.02.24
+27.git注释要写清楚干了什么，永远不要写"调整代码。"这样的git注释。
+28. 如果发现不应该按issue或者原型做，那就要先和老王 说，让老王 把issue/原型改了，然后再按改了之后的做。不要做成和issue/原型 不一样的。
+29. 新的代码和数据库改动都要注释清楚是应对哪个issue以及issue里的需求号。
+30. 如果一个issue里需求很多，那么应该分成多个merge来做，每个merge写清楚应对哪个issue以及issue里的需求号。
+31. 不要偷鸡摸狗改请求参数。
+32. 注释，提示信息以及任何事都不要挂羊头卖狗肉 。
+33. 不要掩耳盗铃，不要刻舟求剑，不要南辕北辙，不要画蛇添足，不要削足适履。买一本成语故事，找到里面讽刺傻逼的那些熟读，时刻反省自己是不是犯了。
+34. 每个merge request改动的文件都不要超过5个。而且必须要能用一句话说明做了什么改动。
+*35. 每个对数据库做写操作的接口都要把 操作结果，操作对象的id，操作产生的影响，商户名，sess_id，请求来源ip地址 记日志。 用XXXConsoleService.logger.info记。        一种典型的例子是提交daifu，应该这样记:
+        在MerchantConsoleService的方法里面写:
+        logger.info("{}(userid={}) submited daifu,source_ip={}, id={},merchant={}". sess_id, 用户id, 请求来源ip地址， 代付id,商户名);
+        如果 提交daifu 失败，则应该这样记:
+        logger.error("{}(userid={}) failed to submit daifu,source_ip={}, merchant={}, because {}". sess_id, 用户id, 请求来源ip地址， 商户名,失败原因 );
+        或
+        logger.error("{}(userid={}) failed to submit daifu,source_ip={}, merchant={}, because {}". sess_id, 用户id, 请求来源ip地址， 商户名,失败原因,异常 );
+        失败原因 可能是没有权限或余额不足这种的。
+    管理后台的日志不必记商户名字。
+*36. 所有输出到浏览器的文本都要做XSS(跨域脚步攻击)的防护，最基本的是把 < 换成 &lt; 把 > 换成  &gt; 。
+        在java里用 https://github.com/coverity/coverity-security-library 的 https://coverity.github.io/coverity-security-library/com/coverity/security/Escape.html 来转义才算比较安全。
+        参照CoveriyDemo.main里的htmlText。
+        或者用 https://github.com/ecto/bleach 在前端做处理。
+*37 所有git操作都要用 git-bash的命令，不要用任何图形界面工具或ide插件，gitlab的网页也不要用 。
+*38 每天上班第一件事是在slack里告诉我目前在做的工作以及今天打算做的工作。
